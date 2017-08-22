@@ -1,0 +1,98 @@
+<html>
+  <head>
+    <title>Viewer</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="/style.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <div id="fullscreen-content">
+      <%= @content.read %>
+      <div class="toggleThing">
+        Changey Thing<a href="#" onclick="doFullscreen()">Fullscreen</a><br/>
+        <a href="#" id="previousButton" onclick="previousSlide()">Back</a>&nbsp;<a href="#"onclick="advanceSlide()" id="forwardButton">Forward</a>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+    var previous_slide = 0;
+    var allSlides = 0;
+    var startSlide = <%= @slide %>;
+    function changeSlide(slide){
+      toggleSlide(previous_slide);
+      toggleSlide(slide);
+      previous_slide = slide;
+    }
+    function toggleSlide(slide){
+      var x = document.getElementById('slide-' + slide);
+      if (x.style.display === 'none') {
+        x.style.display = 'block';
+      } else {
+        x.style.display = 'none';
+      }
+    }
+    function advanceSlide(){
+      if(previous_slide + 1 != allSlides){
+        changeSlide(previous_slide + 1);
+        if($('#previousButton').attr('disabled') == "disabled"){
+          $('#previousButton').removeAttr('disabled');
+        }
+      }else{
+        $('#forwardButton').attr('disabled', 'disabled');
+      }
+    }
+    function previousSlide(){
+      if(previous_slide != 0){
+        if(previous_slide != 0){
+          changeSlide(previous_slide - 1);
+        }
+        if($('#forwardButton').attr('disabled') == "disabled"){
+          $('#forwardButton').removeAttr('disabled');
+        }
+      }else{
+        $('#previousButton').attr('disabled', 'disabled');
+      }
+    }
+    function init(){
+      var count = true;
+      var i = 0;
+      do{
+        var working = document.getElementById('slide-' + i);
+        if(document.body.contains(working)){
+          if(i != startSlide){
+            toggleSlide(i);
+          }
+          i++;
+        }else{
+          count = false;
+        }
+      }
+      while(count == true);
+      allSlides = i;
+    }
+    init();
+    $("td > a").on("click", function(event){
+      if ($(this).is("[disabled]")) {
+        event.preventDefault();
+      }
+    });
+      function requestFullScreen(element) {
+        // Supports most browsers and their versions.
+        var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+
+        if (requestMethod) { // Native full screen.
+          requestMethod.call(element);
+        } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+          var wscript = new ActiveXObject("WScript.Shell");
+          if (wscript !== null) {
+              wscript.SendKeys("{F11}");
+          }
+      }
+    }
+    function doFullscreen(){
+      var elem = document.getElementById('fullscreen-content');
+      requestFullScreen(elem);
+    }
+    </script>
+  </body>
+</html>
